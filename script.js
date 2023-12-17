@@ -80,13 +80,13 @@ $(document).ready(function () {
                 const userTranslation = translationInput.val().trim().toLowerCase();
                 const correctTranslation = beginnerWords[wordIndex].translation.toLowerCase();
 
-                if (userTranslation === correctTranslation) {
-                    correctCount++;
-                    $(`.card[data-index="${wordIndex}"]`).addClass('correct-answer');
-                } else {
-                    incorrectCount++;
-                    $(`.card[data-index="${wordIndex}"]`).addClass('incorrect-answer');
-                }
+               if (userTranslation.toLowerCase() === correctTranslation.toLowerCase()) {
+    correctCount++;
+    $(`.card[data-index="${wordIndex}"]`).addClass('correct-answer');
+} else {
+    incorrectCount++;
+    $(`.card[data-index="${wordIndex}"]`).addClass('incorrect-answer');
+}
 
                 currentStep++;
                 updateStatus();
