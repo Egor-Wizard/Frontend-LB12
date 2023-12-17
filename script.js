@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    const beginnerWords = [
+        const beginnerWords = [
             { word: 'Hello', translation: 'Привіт' },
             { word: 'Goodbye', translation: 'До побачення' },
             { word: 'after', translation: 'Після' },
@@ -49,8 +49,7 @@ $(document).ready(function () {
 
             const shuffledWords = shuffleArray(words);
             shuffledWords.forEach((word, index) => {
-                const card = $(`<div class="card">${word.word}</div>`);
-                card.data('index', index);
+                const card = $(`<div class="card" data-index="${index}">${word.word}</div>`);
                 cardContainer.append(card);
             });
         }
@@ -65,7 +64,53 @@ $(document).ready(function () {
             $('#incorrect-count').text(incorrectCount);
         }
 
-        function showModal() {
+        function showModal(wordIndex) {
+            const modal = $('#result-modal');
+            const modalContent = $('#modal-content');
+            const modalWord = $('#modal-word');
+            const translationInput = $('#translation-input');
+            const checkButton = $('#check-translation');
+
+            modalWord.text(beginnerWords[wordIndex].word);
+            translationInput.val('');
+
+            modal.show();
+
+            checkButton.off('click').on('click', function () {
+                const userTranslation = translationInput.val().trim().toLowerCase();
+                const correctTranslation = beginnerWords[wordIndex].translation.toLowerCase();
+
+                if (userTranslation === correctTranslation) {
+                    correctCount++;
+                    $(`.card[data-index="${wordIndex}"]`).addClass('correct-answer');
+                } else {
+                    incorrectCount++;
+                    $(`.card[data-index="${wordIndex}"]`).addClass('incorrect-answer');
+                }
+
+                currentStep++;
+                updateStatus();
+
+                if (currentStep === beginnerWords.length) {
+                    modal.hide();
+                    showResultModal();
+                } else {
+                    modal.hide();
+                }
+            });
+
+            $('.close').click(function () {
+                modal.hide();
+            });
+
+            $(window).click(function (event) {
+                if (event.target === modal[0]) {
+                    modal.hide();
+                }
+            });
+        }
+
+        function showResultModal() {
             const modal = $('#result-modal');
             const proficiencyLevel = getProficiencyLevel();
 
@@ -125,24 +170,6 @@ $(document).ready(function () {
 
         $('#card-container').on('click', '.card', async function () {
             const index = $(this).data('index');
-            const translation = await translateWordAsync(beginnerWords[index].word);
-
-            // Reveal the translation
-            $(this).text(beginnerWords[index].translation);
-
-            if (translation && translation.toLowerCase() === beginnerWords[index].translation.toLowerCase()) {
-                correctCount++;
-                $(this).addClass('correct-answer').removeClass('incorrect-answer');
-            } else {
-                incorrectCount++;
-                $(this).addClass('incorrect-answer').removeClass('correct-answer');
-            }
-
-            currentStep++;
-            updateStatus();
-
-            if (currentStep === beginnerWords.length) {
-                showModal();
-            }
+            showModal(index);
         });
-});
+    });
